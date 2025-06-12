@@ -1,0 +1,86 @@
+const TicTacToe = require('../src/TicTacToe');
+
+describe('TicTacToe', () => {
+  let game;
+  
+  beforeEach(() => {
+    game = new TicTacToe();
+  });
+  
+  it('should have X as the first player', () => {
+    expect(game.currentPlayer).toBe('X');
+  });
+  
+  it('should allow X to make the first move', () => {
+    expect(game.makeMove(0, 0)).toBe(true);
+    expect(game.board[0][0]).toBe('X');
+  });
+  
+  it('should alternate players after each move', () => {
+    game.makeMove(0, 0); // X moves
+    expect(game.currentPlayer).toBe('O');
+    game.makeMove(0, 1); // O moves
+    expect(game.currentPlayer).toBe('X');
+  });
+  
+  it('should not allow playing on a played position', () => {
+    game.makeMove(0, 0); // X moves
+    expect(game.makeMove(0, 0)).toBe(false); // O tries same position
+    expect(game.currentPlayer).toBe('O'); // Should still be O's turn
+  });
+  
+  it('should detect horizontal win', () => {
+    game.makeMove(0, 0); // X
+    game.makeMove(1, 0); // O
+    game.makeMove(0, 1); // X
+    game.makeMove(1, 1); // O
+    expect(game.makeMove(0, 2)).toBe(true); // X wins
+    expect(game.getWinner()).toBe('X');
+    expect(game.isGameOver()).toBe(true);
+  });
+  
+  it('should detect vertical win', () => {
+    game.makeMove(0, 0); // X
+    game.makeMove(0, 1); // O
+    game.makeMove(1, 0); // X
+    game.makeMove(1, 1); // O
+    expect(game.makeMove(2, 0)).toBe(true); // X wins
+    expect(game.getWinner()).toBe('X');
+  });
+  
+  it('should detect diagonal win', () => {
+    game.makeMove(0, 0); // X
+    game.makeMove(0, 1); // O
+    game.makeMove(1, 1); // X
+    game.makeMove(0, 2); // O
+    expect(game.makeMove(2, 2)).toBe(true); // X wins
+    expect(game.getWinner()).toBe('X');
+  });
+  
+  it('should detect a draw', () => {
+    // X O X
+    // X O O
+    // O X X
+    game.makeMove(0, 0); // X
+    game.makeMove(0, 1); // O
+    game.makeMove(0, 2); // X
+    game.makeMove(1, 1); // O
+    game.makeMove(1, 0); // X
+    game.makeMove(2, 0); // O
+    game.makeMove(1, 2); // X
+    game.makeMove(2, 2); // O
+    expect(game.makeMove(2, 1)).toBe(true); // X
+    expect(game.getWinner()).toBe(null);
+    expect(game.isGameOver()).toBe(true);
+  });
+  
+  it('should not allow moves after game is over', () => {
+    // X X X win
+    game.makeMove(0, 0); // X
+    game.makeMove(1, 0); // O
+    game.makeMove(0, 1); // X
+    game.makeMove(1, 1); // O
+    game.makeMove(0, 2); // X wins
+    expect(game.makeMove(2, 2)).toBe(false); // Should not allow
+  });
+});
